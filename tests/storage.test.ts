@@ -48,14 +48,13 @@ describe("TaskWorkbook", () => {
     expect(await workbook.list({ weekStart: "2026-07-06" })).toHaveLength(0);
   });
 
-  it("creates the workbook file when reading info and data", async () => {
+  it("creates the workbook file when listing data", async () => {
     const workbook = new TaskWorkbook(tempDir);
-    const infoBefore = await workbook.getInfo();
-    expect(infoBefore.exists).toBe(false);
+    const workbookFile = path.join(tempDir, "DailyTracker.xlsx");
+    await expect(fs.access(workbookFile)).rejects.toThrow();
 
     await workbook.list({ weekStart: "2026-07-06" });
-    const infoAfter = await workbook.getInfo();
-    expect(infoAfter.exists).toBe(true);
+    await expect(fs.access(workbookFile)).resolves.toBeUndefined();
   });
 
   it("serializes concurrent creates without losing rows or duplicating IDs", async () => {

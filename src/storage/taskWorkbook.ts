@@ -8,8 +8,7 @@ import {
   TaskFilter,
   TaskInput,
   TaskRow,
-  validateTaskInput,
-  WorkbookInfo
+  validateTaskInput
 } from "../domain/task.js";
 
 const WORKBOOK_NAME = "DailyTracker.xlsx";
@@ -22,13 +21,6 @@ export class TaskWorkbook {
 
   constructor(private readonly baseDirectory: string) {
     this.filePath = path.join(baseDirectory, WORKBOOK_NAME);
-  }
-
-  async getInfo(): Promise<WorkbookInfo> {
-    return {
-      path: this.filePath,
-      exists: await fileExists(this.filePath)
-    };
   }
 
   async list(filter: TaskFilter): Promise<TaskRow[]> {

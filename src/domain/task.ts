@@ -15,11 +15,6 @@ export type TaskFilter = {
   day?: string;
 };
 
-export type WorkbookInfo = {
-  path: string;
-  exists: boolean;
-};
-
 export type ValidationResult = {
   valid: boolean;
   errors: Partial<Record<keyof TaskInput, string>>;

@@ -9,8 +9,7 @@ const api: TaskApi = {
   list: vi.fn(),
   create: vi.fn(),
   update: vi.fn(),
-  remove: vi.fn(),
-  getWorkbookInfo: vi.fn()
+  remove: vi.fn()
 };
 
 beforeEach(() => {
@@ -25,7 +24,6 @@ beforeEach(() => {
   });
   api.update = vi.fn();
   api.remove = vi.fn();
-  api.getWorkbookInfo = vi.fn().mockResolvedValue({ path: "/tmp/DailyTracker.xlsx", exists: true });
   window.taskApi = api;
 });
 

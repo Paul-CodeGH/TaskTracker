@@ -73,7 +73,6 @@ function registerIpc(): void {
   ipcMain.handle("tasks:create", async (_event, input: TaskInput) => getWorkbook().create(input));
   ipcMain.handle("tasks:update", async (_event, id: number, input: TaskInput) => getWorkbook().update(id, input));
   ipcMain.handle("tasks:remove", async (_event, id: number) => getWorkbook().remove(id));
-  ipcMain.handle("tasks:workbookInfo", async () => getWorkbook().getInfo());
 }
 
 function getWorkbook(): TaskWorkbook {
