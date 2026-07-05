@@ -82,6 +82,17 @@ export class TaskWorkbook {
     });
   }
 
+  async saveCopyAs(destinationPath: string): Promise<void> {
+    await this.waitForPendingMutation();
+    await this.loadWorkbook();
+
+    if (path.resolve(destinationPath) === path.resolve(this.filePath)) {
+      return;
+    }
+
+    await fs.copyFile(this.filePath, destinationPath);
+  }
+
   private async withMutation<T>(operation: () => Promise<T>): Promise<T> {
     const nextOperation = this.operationQueue.then(operation, operation);
     this.operationQueue = nextOperation.catch(() => undefined);

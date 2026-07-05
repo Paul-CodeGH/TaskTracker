@@ -9,7 +9,8 @@ const api: TaskApi = {
   list: vi.fn(),
   create: vi.fn(),
   update: vi.fn(),
-  remove: vi.fn()
+  remove: vi.fn(),
+  saveWorkbookAs: vi.fn()
 };
 
 beforeEach(() => {
@@ -24,6 +25,7 @@ beforeEach(() => {
   });
   api.update = vi.fn();
   api.remove = vi.fn();
+  api.saveWorkbookAs = vi.fn().mockResolvedValue("/tmp/DailyTracker.xlsx");
   window.taskApi = api;
 });
 
@@ -125,5 +127,13 @@ describe("App", () => {
 
     await screen.findByRole("button", { name: /add row/i });
     expect(container.querySelector(".day-button.today")).toBeInTheDocument();
+  });
+
+  it("opens the workbook save dialog from the toolbar", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(await screen.findByRole("button", { name: /save excel as/i }));
+    expect(api.saveWorkbookAs).toHaveBeenCalled();
   });
 });

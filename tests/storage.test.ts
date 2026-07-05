@@ -76,6 +76,26 @@ describe("TaskWorkbook", () => {
     expect(await workbook.list({ weekStart: "2026-07-06" })).toHaveLength(5);
   });
 
+  it("saves a copy of the workbook to a selected path", async () => {
+    const workbook = new TaskWorkbook(tempDir);
+    const exportPath = path.join(tempDir, "ExportedTracker.xlsx");
+
+    await workbook.create({
+      date: "2026-07-06",
+      checkIn: "09:00",
+      checkOut: "10:00",
+      task: "Export workbook",
+      stillToDo: ""
+    });
+    await workbook.saveCopyAs(exportPath);
+
+    const exportedWorkbook = new ExcelJS.Workbook();
+    await exportedWorkbook.xlsx.readFile(exportPath);
+    const worksheet = exportedWorkbook.getWorksheet("DailyTracker");
+
+    expect(worksheet?.getRow(2).getCell(6).value).toBe("Export workbook");
+  });
+
   it("fails clearly when an existing workbook has unexpected headers", async () => {
     const workbookFile = path.join(tempDir, "DailyTracker.xlsx");
     const workbook = new ExcelJS.Workbook();

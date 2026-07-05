@@ -55,6 +55,12 @@ textarea:disabled {
   margin-bottom: 22px;
 }
 
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 h1,
 h2,
 h3,

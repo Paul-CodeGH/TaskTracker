@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { Download, Plus } from "lucide-react";
 import { useState } from "react";
 import { TaskRow } from "../domain/task";
 import { TaskFormModal } from "./components/TaskFormModal";
@@ -13,6 +13,7 @@ type ModalState =
 export default function App() {
   const tracker = useTasks();
   const [modal, setModal] = useState<ModalState | null>(null);
+  const [isSavingWorkbook, setIsSavingWorkbook] = useState(false);
 
   function openAddForm() {
     setModal({ mode: "create", defaultDate: tracker.selectedDay ?? tracker.today });
@@ -36,16 +37,33 @@ export default function App() {
     await tracker.removeTask(task.id);
   }
 
+  async function saveWorkbookAs() {
+    setIsSavingWorkbook(true);
+    try {
+      await window.taskApi.saveWorkbookAs();
+    } catch (error) {
+      window.alert(getErrorMessage(error));
+    } finally {
+      setIsSavingWorkbook(false);
+    }
+  }
+
   return (
     <main className="app-shell">
       <section className="toolbar" aria-label="Task tracker controls">
         <div>
           <h1>Task Tracker</h1>
         </div>
-        <button className="primary-action" type="button" onClick={openAddForm} disabled={tracker.isMutating}>
-          <Plus size={18} aria-hidden="true" />
-          Add row
-        </button>
+        <div className="toolbar-actions">
+          <button className="secondary-action" type="button" onClick={saveWorkbookAs} disabled={tracker.isMutating || isSavingWorkbook}>
+            <Download size={18} aria-hidden="true" />
+            Save Excel As
+          </button>
+          <button className="primary-action" type="button" onClick={openAddForm} disabled={tracker.isMutating || isSavingWorkbook}>
+            <Plus size={18} aria-hidden="true" />
+            Add row
+          </button>
+        </div>
       </section>
 
       <WeekNavigator
@@ -79,4 +97,8 @@ export default function App() {
       ) : null}
     </main>
   );
+}
+
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : "Could not save the Excel file.";
 }

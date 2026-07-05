@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, session } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, session } from "electron";
 import path from "node:path";
 import { TaskInput } from "../domain/task.js";
 import { TaskWorkbook } from "../storage/taskWorkbook.js";
@@ -73,6 +73,28 @@ function registerIpc(): void {
   ipcMain.handle("tasks:create", async (_event, input: TaskInput) => getWorkbook().create(input));
   ipcMain.handle("tasks:update", async (_event, id: number, input: TaskInput) => getWorkbook().update(id, input));
   ipcMain.handle("tasks:remove", async (_event, id: number) => getWorkbook().remove(id));
+  ipcMain.handle("tasks:saveWorkbookAs", async () => saveWorkbookAs());
+}
+
+async function saveWorkbookAs(): Promise<string | undefined> {
+  const options = {
+    title: "Save DailyTracker.xlsx",
+    defaultPath: path.join(app.getPath("documents"), "DailyTracker.xlsx"),
+    filters: [{ name: "Excel Workbook", extensions: ["xlsx"] }]
+  };
+  const result = mainWindow ? await dialog.showSaveDialog(mainWindow, options) : await dialog.showSaveDialog(options);
+
+  if (result.canceled || !result.filePath) {
+    return undefined;
+  }
+
+  const destinationPath = ensureXlsxExtension(result.filePath);
+  await getWorkbook().saveCopyAs(destinationPath);
+  return destinationPath;
+}
+
+function ensureXlsxExtension(filePath: string): string {
+  return path.extname(filePath).toLowerCase() === ".xlsx" ? filePath : `${filePath}.xlsx`;
 }
 
 function getWorkbook(): TaskWorkbook {
